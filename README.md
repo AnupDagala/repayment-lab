@@ -1,51 +1,38 @@
 # Repayment Lab
 
-A reproducible **Python + SQL collections analytics portfolio project** by Anup Dagala. It answers: *where is repayment deteriorating, how does it change with loan age, and can we reconcile every rupee?*
+**Python + SQL collections analytics by Anup Dagala.** Point-in-time repayment metrics, delinquency transitions, comparable origination cohorts, drilldown and integer-paise ledger reconciliation.
 
-**Entirely synthetic. Independent project; no Navi affiliation, customer data, proprietary information, or claims about Navi's performance.**
+Entirely synthetic data. Independent portfolio project; no Navi affiliation, customer data or claims about Navi's performance.
 
-## Run in under a minute
+## Run
 
-Python 3.10+; no third-party Python dependencies.
+The complete verified project is packaged in `Repayment_Lab.zip`, including the original SQL, 21 tests, docs, workflow, CSV exports, database and self-contained dashboard. Root Python and dashboard-template files are also exposed for code review. Restore the source tree once after cloning:
 
 ```sh
+python bootstrap.py
 python lab.py
 python -m unittest discover -s tests -v
 ```
 
-Open `demo/index.html` directly in a browser. It is a self-contained interactive dashboard: no CDN, server, credentials, or network calls. Optionally serve it with `python -m http.server 8000 --directory demo`.
+Python 3.10+; no third-party Python dependencies. Open `demo/index.html` in a browser. No server, login, CDN or network calls are needed.
 
-## What to inspect
+Alternatively extract `Repayment_Lab.zip` and open `repayment-lab/demo/index.html` immediately.
 
-- Snapshot and borrower-segment filters; KPI cards and loan-level drilldown.
-- DPD distribution, Aug→Sep transition counts and row percentages.
-- Origination cohorts compared at the same month-on-book, avoiding age confounding.
-- Point-in-time payment filtering; split payment aggregation before joins.
-- Integer-paise money, capped allocations, explicit overpayment flags and ledger reconciliation.
-- Exported CSVs, SQLite database, reproducible raw tables and artifact hashes.
+## Evidence
 
-The committed `demo/` is ready to open. `sql/schema.sql` and `sql/snapshot.sql` expose the core analytical logic. The sample has 600 loans, 3,600 installments and reproducible split payments.
+21 Python tests passed. 12 date/segment combinations passed in a Node DOM harness, not a real browser test. All three snapshots reconciled with zero-paise delta and no foreign-key errors. Browser layout, live GitHub Actions and production deployment remain unverified.
 
-## Metric contract
+Read [technical-brief.md](technical-brief.md) for metric definitions, synthetic assumptions and investigation reasoning, and [verification.md](verification.md) for verification boundaries.
 
-`docs/technical-brief.md` defines every denominator, cutoff, accounting limitation and simulation assumption. Scheduled balances include installment amounts; they are **not principal exposure**, regulatory NPA or IFRS measures. This demo excludes interest decomposition, reversals, collections interventions and real-world ingestion. Collection rate is cumulative against installments due at the cutoff, not a cash-in-month measure.
+## What it demonstrates
 
-## Verification
+- Payments aggregated before joining to avoid multiplying installment dues.
+- Historical cutoff filtering to prevent future repayments curing past delinquency.
+- Partial repayment handling, capped allocation, explicit overpayment flags.
+- Fixed month-on-book comparisons instead of mixing different loan ages.
+- Loan drilldown, segment filters, cumulative collection rate and transition matrix.
+- CSV/database handoff for Power BI or Tableau; no native BI workbook claimed.
 
-21 Python tests passed, including a hand-calculated ledger and temporal leakage checks. 12 date/segment combinations passed in a Node DOM harness (`node tests/check_dashboard.cjs`). The harness checks rendered content and filter behavior; it is not a browser screenshot or cross-browser test. See `docs/verification.md` for boundaries.
+Scheduled installment balances are not principal exposure or regulatory NPA measures. No borrower decisions, real collection actions or causal recovery-lift estimates are made.
 
-## BI handoff
-
-Use `demo/loan_snapshot.csv` in Power BI/Tableau to rebuild the September snapshot. See `docs/bi-handoff.md` for measures and reconciliation. No PBIX or Tableau workbook is claimed.
-
-## Publication
-
-Intended repository name: `repayment-lab`. Once GitHub CLI is authenticated, run:
-
-```sh
-gh repo create repayment-lab --public --source=. --remote=origin --push
-```
-
-This command publishes the independent project; GitHub Pages deployment is optional and not included. A CI workflow is present, but a live GitHub Actions run is not yet verified.
-
-MIT license.
+MIT license. The repository was published using GitHub's web upload workflow; it does not preserve the original local commit ID.
